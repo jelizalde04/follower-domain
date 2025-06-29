@@ -1,0 +1,27 @@
+services:
+  add-follower:
+    build:
+      context: ./add-follower
+    image: ${DOCKERHUB_USERNAME}/add-follower:latest
+    ports:
+      - "7001:7001"
+    env_file:
+      - ./add-follower/.env
+
+  get-followers:
+    build:
+      context: ./get-followers
+    image: ${DOCKERHUB_USERNAME}/get-followers:latest
+    ports:
+      - "7003:7003"
+    env_file:
+      - ./get-followers/.env
+
+  remove-follower:
+    build:
+      context: ./remove-follower
+    image: ${DOCKERHUB_USERNAME}/remove-follower:latest
+    ports:
+      - "7002:7002"
+    env_file:
+      - ./remove-follower/.env
