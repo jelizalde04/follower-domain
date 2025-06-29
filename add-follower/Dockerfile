@@ -1,12 +1,24 @@
-FROM eclipse-temurin:17-jdk-alpine
+# Usa una imagen oficial de Ruby
+FROM ruby:3.4.4
 
+# Instala dependencias de sistema (nodejs y yarn para Rails)
+RUN apt-get update -qq && \
+    apt-get install -y build-essential libpq-dev nodejs yarn
+
+# Define carpeta de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copy built JAR file (change name to match your project)
-COPY build/libs/add-follower-*.jar app.jar
+# Copia el Gemfile y Gemfile.lock primero (para aprovechar la cache de Docker)
+COPY Gemfile Gemfile.lock ./
 
-# Port from your Swagger config
-EXPOSE 6001
+# Instala gems
+RUN bundle install
 
-# Run with production profile and memory limits
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Copia el resto del código de tu proyecto
+COPY . .
+
+# Expone el puerto Rails (7001)
+EXPOSE 7003
+
+# Comando para arrancar el servidor
+CMD ["rails", "server", "-b", "0.0.0.0", "-p", "7003"]

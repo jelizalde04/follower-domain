@@ -1,45 +1,111 @@
-# Follower Microservice with WebHook – Spring Boot + Swagger
+# Add-Follower Microservice
 
-This project is a microservice developed in Java with Spring Boot, designed to manage the action of following (giving "follow") between users. When a user follows another, a notification is sent to another system via a WebHook.
+## 1. Service Overview
 
-## Key Features
+The **add-follower** service creates "follow" relationships between pets. It allows one pet to follow another and stores the relationship in the `followers` table.
 
-- Exposes a REST endpoint (`POST /followers`) to register a new follower.
-- Verifies that the user has not already followed the same profile.
-- Registers the follow relationship in a many-to-many table.
-- Sends a WebHook notification to another service when a user follows another.
-- Uses Swagger UI for interactive documentation and API testing.
+- Interacts indirectly with other microservices via the database and JWT authentication.
+- (Planned) Will publish events via gRPC to the Notification Service.
 
-## `/followers` Endpoint Flow
+---
 
-### Request
+## 2. Routes and Endpoints
 
-**Method:** `POST`
+### Create Follower
 
-**URL:** `/followers`
+```http
+POST /api/v1/followers
+```
 
-**Request Body:**
+Request Example:
 
 ```json
 {
-  "followedId": 123
+  "followerId": "uuid",
+  "petId": "uuid"
 }
+```
 
+Response Example:
 
-### Successful Response (201 Created)
+```json
 {
-    "message": "User successfully followed.",
-    "status": 201
+  "message": "Follow created successfully",
+  "data": {
+    "id": "uuid",
+    "followerId": "uuid",
+    "petId": "uuid",
+    "createdAt": "2025-06-27T18:10:00Z"
+  }
 }
+```
 
-### Error Response (400 Bad Request)
-{
-    "message": "The user already follows this profile.",
-    "status": 400
-}
+---
 
-### Swagger Path
+## 3. How the Service Works
+1. Validates JWT token.
+2. Checks that petId belongs to the authenticated user.
+3. Prevents a pet from following itself.
+4. Creates a new record in the followers table.
+5. (Future) Publishes an event via gRPC.
 
-    The path to access the interactive Swagger documentation is:
+---
 
-        http://localhost:6001/api-docs-followers
+## 4. Technologies Used
+
+- Ruby 3.2+
+- Rails 8.x API
+- PostgreSQL
+- JWT
+- Rswag for Swagger documentation
+
+---
+
+## 5. Authentication and Security
+
+- JWT required in all requests.
+- Token must contain userId.
+- Implemented in before_action :authenticate_request.
+
+---
+
+## 6. Setup and Execution
+
+### Environment Variables
+
+- `DATABASE_URL`
+- `JWT_SECRET`
+
+### Run with Docker
+
+```bash
+docker build -t add-follower .
+docker run -p 7001:7001 add-follower
+```
+
+---
+
+## 7. Swagger Documentation
+
+Available at:
+
+```
+http://localhost:7001/api-docs
+```
+
+---
+
+## 8. Testing and Coverage
+
+Tests are written using RSpec.
+
+Run tests:
+
+```bash
+bundle exec rspec
+```
+
+---
+
+## 9. Contributing
+Fork → Branch → Pull Request.
