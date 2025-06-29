@@ -1,0 +1,84 @@
+openapi: 3.0.1
+info:
+  title: Followers API
+  version: "v1"
+paths:
+  /api/v1/followers:
+    get:
+      summary: Get all followers of a pet by petId
+      tags:
+        - Followers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: petId
+          in: query
+          description: ID of the pet whose followers are requested
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of followers returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  petId:
+                    type: string
+                    format: uuid
+                    description: The pet ID for which followers are listed
+                  followers_count:
+                    type: integer
+                    description: Number of followers
+                  followers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          description: Follower pet ID
+                        name:
+                          type: string
+                          description: Name of the follower pet
+                        created_at:
+                          type: string
+                          format: date-time
+                          description: When the follower pet was created
+        '400':
+          description: Bad request (e.g., missing petId)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '401':
+          description: Unauthorized, invalid or missing token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
