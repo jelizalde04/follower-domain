@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby.exe
+# frozen_string_literal: true
+
+exec './bin/rails', 'server', *ARGV

@@ -1,0 +1,77 @@
+openapi: 3.0.1
+info:
+  title: Add Follower API
+  version: "v1"
+paths:
+  /api/v1/followers:
+    post:
+      summary: Create a follow relationship between pets
+      tags:
+        - Followers
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                followerId:
+                  type: string
+                  format: uuid
+                petId:
+                  type: string
+                  format: uuid
+              required:
+                - followerId
+                - petId
+      responses:
+        '201':
+          description: Follow created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      followerId:
+                        type: string
+                        format: uuid
+                      petId:
+                        type: string
+                        format: uuid
+                      createdAt:
+                        type: string
+                        format: date-time
+        '400':
+          description: Bad request / Duplicate follow
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
