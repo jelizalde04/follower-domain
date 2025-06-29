@@ -1,0 +1,74 @@
+openapi: 3.0.1
+info:
+  title: Add Follower API
+  version: "v1"
+paths:
+  /api/v1/followers:
+    delete:
+      summary: Remove a follower relationship between pets
+      tags:
+        - Followers
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                followerId:
+                  type: string
+                  format: uuid
+                petId:
+                  type: string
+                  format: uuid
+              required:
+                - followerId
+                - petId
+      responses:
+        '200':
+          description: Follower removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      followerId:
+                        type: string
+                        format: uuid
+                      petId:
+                        type: string
+                        format: uuid
+                      removedAt:
+                        type: string
+                        format: date-time
+        '401':
+          description: Unauthorized (not owner or invalid token)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: Follow relationship not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
