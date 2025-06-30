@@ -47,6 +47,9 @@ jobs:
     if: needs.changes.outputs.add_follower == 'true'
     steps:
       - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
       - name: Generate .env for add-follower
         working-directory: ./add-follower
         run: |
@@ -59,10 +62,9 @@ jobs:
           PET_DB_NAME=${{ secrets.PET_DB_NAME }}
           FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
           EOF
-      - name: Install dependences  & Run RuboCop
+      - name: Install dependences & Run RuboCop
         working-directory: ./add-follower
         run: |
-          gem install bundler
           bundle install
           bundle exec rubocop
 
@@ -150,6 +152,9 @@ jobs:
     if: needs.changes.outputs.get_followers == 'true'
     steps:
       - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
       - name: Generate .env for get-followers
         working-directory: ./get-followers
         run: |
@@ -162,10 +167,9 @@ jobs:
           PET_DB_NAME=${{ secrets.PET_DB_NAME }}
           FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
           EOF
-      - name: Install dependences  & Run RuboCop
+      - name: Install dependences & Run RuboCop
         working-directory: ./get-followers
         run: |
-          gem install bundler
           bundle install
           bundle exec rubocop
 
@@ -252,6 +256,9 @@ jobs:
     if: needs.changes.outputs.remove_follower == 'true'
     steps:
       - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
       - name: Generate .env for remove-follower
         working-directory: ./remove-follower
         run: |
@@ -264,10 +271,9 @@ jobs:
           PET_DB_NAME=${{ secrets.PET_DB_NAME }}
           FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
           EOF
-      - name: Install dependences  & Run RuboCop
+      - name: Install dependences & Run RuboCop
         working-directory: ./remove-follower
         run: |
-          gem install bundler
           bundle install
           bundle exec rubocop
 
@@ -346,4 +352,3 @@ jobs:
               --env-file /home/ubuntu/remove-follower.env \
               -p 7002:7002 \
               ${{ secrets.DOCKERHUB_USERNAME }}/remove-follower:latest
-
