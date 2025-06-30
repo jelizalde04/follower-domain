@@ -1,0 +1,349 @@
+name: CI/CD Followers Microservices (split jobs)
+
+on:
+  push:
+    branches: [main, test]
+    paths:
+      - 'add-follower/**'
+      - 'get-followers/**'
+      - 'remove-follower/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'add-follower/**'
+      - 'get-followers/**'
+      - 'remove-follower/**'
+      - '.github/workflows/**'
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      add_follower: ${{ steps.filter.outputs.add_follower }}
+      get_followers: ${{ steps.filter.outputs.get_followers }}
+      remove_follower: ${{ steps.filter.outputs.remove_follower }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            add_follower:
+              - 'add-follower/**'
+            get_followers:
+              - 'get-followers/**'
+            remove_follower:
+              - 'remove-follower/**'
+
+  # --------- ADD-FOLLOWER JOBS ---------
+  test_add_follower:
+    needs: changes
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.add_follower == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate .env for add-follower
+        working-directory: ./add-follower
+        run: |
+          cat <<EOF > .env
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+          FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+          EOF
+      - name: Install dependences  & Run RuboCop
+        working-directory: ./add-follower
+        run: |
+          gem install bundler
+          bundle install
+          bundle exec rubocop
+
+  build_and_push_add_follower:
+    needs: test_add_follower
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.add_follower == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build add-follower image
+        working-directory: ./add-follower
+        run: docker build -t ${{ env.DOCKERHUB_USERNAME }}/add-follower:latest .
+      - name: Login to DockerHub
+        run: echo "${{ env.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+      - name: Push add-follower image
+        run: docker push ${{ env.DOCKERHUB_USERNAME }}/add-follower:latest
+
+  # ------- DEPLOY ADD-FOLLOWER JOBS -------
+  deploy_add_follower_test:
+    needs: build_and_push_add_follower
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.add_follower == 'true' && github.ref == 'refs/heads/test'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy add-follower to EC2 QA
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_FOLLOWERS_DOMAIN_QA }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cat <<EOF > /home/ubuntu/add-follower.env
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            EOF
+
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/add-follower:latest
+            docker stop add-follower || true && docker rm add-follower || true
+            docker run -d --name add-follower \
+              --env-file /home/ubuntu/add-follower.env \
+              -p 7001:7001 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/add-follower:latest
+
+  deploy_add_follower_prod:
+    needs: build_and_push_add_follower
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.add_follower == 'true' && (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main'))
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy add-follower to EC2 PROD
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_FOLLOWERS_DOMAIN_PROD }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY_PROD }}
+          script: |
+            cat <<EOF > /home/ubuntu/add-follower.env
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            EOF
+
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/add-follower:latest
+            docker stop add-follower || true && docker rm add-follower || true
+            docker run -d --name add-follower \
+              --env-file /home/ubuntu/add-follower.env \
+              -p 7001:7001 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/add-follower:latest
+
+  # --------- GET-FOLLOWERS JOBS ---------
+  test_get_followers:
+    needs: changes
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.get_followers == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate .env for get-followers
+        working-directory: ./get-followers
+        run: |
+          cat <<EOF > .env
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+          FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+          EOF
+      - name: Install dependences  & Run RuboCop
+        working-directory: ./get-followers
+        run: |
+          gem install bundler
+          bundle install
+          bundle exec rubocop
+
+  build_and_push_get_followers:
+    needs: test_get_followers
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.get_followers == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build get-followers image
+        working-directory: ./get-followers
+        run: docker build -t ${{ env.DOCKERHUB_USERNAME }}/get-followers:latest .
+      - name: Login to DockerHub
+        run: echo "${{ env.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+      - name: Push get-followers image
+        run: docker push ${{ env.DOCKERHUB_USERNAME }}/get-followers:latest
+
+  deploy_get_followers_test:
+    needs: build_and_push_get_followers
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.get_followers == 'true' && github.ref == 'refs/heads/test'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy get-followers to EC2 QA
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_FOLLOWERS_DOMAIN_QA }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cat <<EOF > /home/ubuntu/get-followers.env
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            EOF
+
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/get-followers:latest
+            docker stop get-followers || true && docker rm get-followers || true
+            docker run -d --name get-followers \
+              --env-file /home/ubuntu/get-followers.env \
+              -p 7003:7003 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/get-followers:latest
+
+  deploy_get_followers_prod:
+    needs: build_and_push_get_followers
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.get_followers == 'true' && (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main'))
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy get-followers to EC2 PROD
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_FOLLOWERS_DOMAIN_PROD }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY_PROD }}
+          script: |
+            cat <<EOF > /home/ubuntu/get-followers.env
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            EOF
+
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/get-followers:latest
+            docker stop get-followers || true && docker rm get-followers || true
+            docker run -d --name get-followers \
+              --env-file /home/ubuntu/get-followers.env \
+              -p 7003:7003 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/get-followers:latest
+
+  # --------- REMOVE-FOLLOWER JOBS ---------
+  test_remove_follower:
+    needs: changes
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.remove_follower == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate .env for remove-follower
+        working-directory: ./remove-follower
+        run: |
+          cat <<EOF > .env
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+          FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+          EOF
+      - name: Install dependences  & Run RuboCop
+        working-directory: ./remove-follower
+        run: |
+          gem install bundler
+          bundle install
+          bundle exec rubocop
+
+  build_and_push_remove_follower:
+    needs: test_remove_follower
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.remove_follower == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build remove-follower image
+        working-directory: ./remove-follower
+        run: docker build -t ${{ env.DOCKERHUB_USERNAME }}/remove-follower:latest .
+      - name: Login to DockerHub
+        run: echo "${{ env.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+      - name: Push remove-follower image
+        run: docker push ${{ env.DOCKERHUB_USERNAME }}/remove-follower:latest
+
+  deploy_remove_follower_test:
+    needs: build_and_push_remove_follower
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.remove_follower == 'true' && github.ref == 'refs/heads/test'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy remove-follower to EC2 QA
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_FOLLOWERS_DOMAIN_QA }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cat <<EOF > /home/ubuntu/remove-follower.env
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            EOF
+
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/remove-follower:latest
+            docker stop remove-follower || true && docker rm remove-follower || true
+            docker run -d --name remove-follower \
+              --env-file /home/ubuntu/remove-follower.env \
+              -p 7002:7002 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/remove-follower:latest
+
+  deploy_remove_follower_prod:
+    needs: build_and_push_remove_follower
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.remove_follower == 'true' && (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main'))
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy remove-follower to EC2 PROD
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_FOLLOWERS_DOMAIN_PROD }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY_PROD }}
+          script: |
+            cat <<EOF > /home/ubuntu/remove-follower.env
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            PET_DB_NAME=${{ secrets.PET_DB_NAME }}
+            FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            EOF
+
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/remove-follower:latest
+            docker stop remove-follower || true && docker rm remove-follower || true
+            docker run -d --name remove-follower \
+              --env-file /home/ubuntu/remove-follower.env \
+              -p 7002:7002 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/remove-follower:latest
+

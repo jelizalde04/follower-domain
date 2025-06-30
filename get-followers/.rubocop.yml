@@ -39,3 +39,4 @@ Metrics/MethodLength:
 
 Layout/EndOfLine:
   Enabled: false
+  
