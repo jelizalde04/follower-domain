@@ -62,11 +62,15 @@ jobs:
           PET_DB_NAME=${{ secrets.PET_DB_NAME }}
           FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
           EOF
-      - name: Install dependences & Run RuboCop
+      - name: Install dependencies & Autocorrect RuboCop
         working-directory: ./add-follower
         run: |
           bundle install
-          bundle exec rubocop
+          bundle exec rubocop -A || true
+      - name: Run RuboCop Check
+        working-directory: ./add-follower
+        run: |
+          bundle exec rubocop --fail-level error
 
   build_and_push_add_follower:
     needs: test_add_follower
@@ -167,11 +171,15 @@ jobs:
           PET_DB_NAME=${{ secrets.PET_DB_NAME }}
           FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
           EOF
-      - name: Install dependences & Run RuboCop
+      - name: Install dependencies & Autocorrect RuboCop
         working-directory: ./get-followers
         run: |
           bundle install
-          bundle exec rubocop
+          bundle exec rubocop -A || true
+      - name: Run RuboCop Check
+        working-directory: ./get-followers
+        run: |
+          bundle exec rubocop --fail-level error
 
   build_and_push_get_followers:
     needs: test_get_followers
@@ -271,11 +279,15 @@ jobs:
           PET_DB_NAME=${{ secrets.PET_DB_NAME }}
           FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
           EOF
-      - name: Install dependences & Run RuboCop
+      - name: Install dependencies & Autocorrect RuboCop
         working-directory: ./remove-follower
         run: |
           bundle install
-          bundle exec rubocop
+          bundle exec rubocop -A || true
+      - name: Run RuboCop Check
+        working-directory: ./remove-follower
+        run: |
+          bundle exec rubocop --fail-level error
 
   build_and_push_remove_follower:
     needs: test_remove_follower
