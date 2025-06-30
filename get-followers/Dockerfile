@@ -18,7 +18,7 @@ RUN bundle install
 COPY . .
 
 # Expone el puerto Rails (7001)
-EXPOSE 7001
+EXPOSE 7003
 
 # Comando para arrancar el servidor
-CMD ["rails", "server", "-b", "0.0.0.0", "-p", "7001"]
+CMD ["rails", "server", "-b", "0.0.0.0", "-p", "7003"]
