@@ -106,6 +106,21 @@ GEM
       raabro (~> 1.4)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    google-protobuf (4.31.1-x64-mingw-ucrt)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-x86_64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
+    googleapis-common-protos-types (1.20.0)
+      google-protobuf (>= 3.18, < 5.a)
+    grpc (1.73.0-x64-mingw-ucrt)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.73.0-x86_64-linux)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc-tools (1.73.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     io-console (0.8.0)
@@ -330,6 +345,8 @@ DEPENDENCIES
   brakeman
   debug
   dotenv-rails
+  grpc
+  grpc-tools
   jwt
   kamal
   pg (~> 1.5)

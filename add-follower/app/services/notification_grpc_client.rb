@@ -1,7 +1,26 @@
-# frozen_string_literal: true
+require 'grpc'
+require_relative '../lib/notification_services_pb' # ajusta ruta si es necesario
 
 class NotificationGrpcClient
-  def send_follow_notification(follower_id:, pet_id:)
-    puts "[gRPC] Notificación: follower_id=#{follower_id} sigue a pet_id=#{pet_id}"
+  def initialize
+    @host = ENV.fetch('NOTIFICATION_GRPC_HOST', 'localhost:50051')
+    @stub = Notification::NotificationService::Stub.new(@host, :this_channel_is_insecure)
+  end
+
+  def send_follow_notification(actor_id:, recipe_id:, responsible_id:, type:, content:, timestamp:)
+    request = Notification::FollowCreatedRequest.new(
+      actorId: actor_id,
+      recipeId: recipe_id,
+      responsibleId: responsible_id,
+      type: type,
+      content: content,
+      timestamp: timestamp
+    )
+    response = @stub.follow_created(request)
+    puts "[gRPC] Notification sent: #{response.message}"
+    true
+  rescue GRPC::BadStatus => e
+    Rails.logger.error("[gRPC] Notification failed: #{e.message}")
+    raise StandardError, "gRPC notification failed: #{e.message}"
   end
 end
