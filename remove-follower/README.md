@@ -101,9 +101,3 @@ bundle exec rspec
 
 Fork → Branch → Pull Request.
 
----
-
-## 10. License
-
-MIT License
-
