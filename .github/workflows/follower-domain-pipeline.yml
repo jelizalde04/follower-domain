@@ -61,6 +61,7 @@ jobs:
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           PET_DB_NAME=${{ secrets.PET_DB_NAME }}
           FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+          NOTIFICATION_GRPC_HOST=${{ secrets.NOTIFICATION_GRPC_HOST }}
           EOF
       - name: Install dependencies & Autocorrect RuboCop
         working-directory: ./add-follower
@@ -108,6 +109,7 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             PET_DB_NAME=${{ secrets.PET_DB_NAME }}
             FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            NOTIFICATION_GRPC_HOST=${{ secrets.NOTIFICATION_GRPC_HOST }}
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
@@ -139,6 +141,7 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             PET_DB_NAME=${{ secrets.PET_DB_NAME }}
             FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            NOTIFICATION_GRPC_HOST=${{ secrets.NOTIFICATION_GRPC_HOST }}
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
@@ -170,6 +173,7 @@ jobs:
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           PET_DB_NAME=${{ secrets.PET_DB_NAME }}
           FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+          NOTIFICATION_GRPC_HOST=${{ secrets.NOTIFICATION_GRPC_HOST }}
           EOF
       - name: Install dependencies & Autocorrect RuboCop
         working-directory: ./get-followers
@@ -216,6 +220,7 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             PET_DB_NAME=${{ secrets.PET_DB_NAME }}
             FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            NOTIFICATION_GRPC_HOST=${{ secrets.NOTIFICATION_GRPC_HOST }}
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
@@ -247,6 +252,7 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             PET_DB_NAME=${{ secrets.PET_DB_NAME }}
             FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            NOTIFICATION_GRPC_HOST=${{ secrets.NOTIFICATION_GRPC_HOST }}
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
@@ -278,6 +284,7 @@ jobs:
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           PET_DB_NAME=${{ secrets.PET_DB_NAME }}
           FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+          NOTIFICATION_GRPC_HOST=${{ secrets.NOTIFICATION_GRPC_HOST }}
           EOF
       - name: Install dependencies & Autocorrect RuboCop
         working-directory: ./remove-follower
@@ -324,6 +331,7 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             PET_DB_NAME=${{ secrets.PET_DB_NAME }}
             FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            NOTIFICATION_GRPC_HOST=${{ secrets.NOTIFICATION_GRPC_HOST }}
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
@@ -355,6 +363,7 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             PET_DB_NAME=${{ secrets.PET_DB_NAME }}
             FOLLOW_DB_NAME=${{ secrets.FOLLOW_DB_NAME }}
+            NOTIFICATION_GRPC_HOST=${{ secrets.NOTIFICATION_GRPC_HOST }}
             EOF
 
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
