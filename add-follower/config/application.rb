@@ -18,7 +18,8 @@ module AddFollower
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    config.eager_load_paths << Rails.root.join('app/lib')
+  
+    $LOAD_PATH.unshift(Rails.root.join('app/lib').to_s) unless $LOAD_PATH.include?(Rails.root.join('app/lib').to_s)
 
     # Configuration for the application, engines, and railties goes here.
     #
