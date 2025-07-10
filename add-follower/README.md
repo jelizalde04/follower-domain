@@ -107,5 +107,5 @@ bundle exec rspec
 
 ---
 
-## 9. Contributing
+## 9. Contributing 
 Fork → Branch → Pull Request.
