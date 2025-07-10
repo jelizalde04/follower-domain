@@ -5,7 +5,7 @@
 require 'google/protobuf'
 
 
-descriptor_data = "\n\x12notification.proto\x12\x0cnotification\"\x82\x01\n\x14\x46ollowCreatedRequest\x12\x0f\n\x07\x61\x63torId\x18\x01 \x01(\t\x12\x10\n\x08recipeId\x18\x02 \x01(\t\x12\x15\n\rresponsibleId\x18\x03 \x01(\t\x12\x0c\n\x04type\x18\x04 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x05 \x01(\t\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"\'\n\x14NotificationResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2n\n\x13NotificationService\x12W\n\rFollowCreated\x12\".notification.FollowCreatedRequest\x1a\".notification.NotificationResponseb\x06proto3"
+descriptor_data = "\n\x12notification.proto\x12\x0cnotification\"\x82\x01\n\x14\x46ollowCreatedRequest\x12\x0f\n\x07\x61\x63torId\x18\x01 \x01(\t\x12\x10\n\x08recipientId\x18\x02 \x01(\t\x12\x15\n\rresponsibleId\x18\x03 \x01(\t\x12\x0c\n\x04type\x18\x04 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x05 \x01(\t\x12\x11\n\ttimestamp\x18\x06 \x01(\t\"\'\n\x14NotificationResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2n\n\x13NotificationService\x12W\n\rFollowCreated\x12\".notification.FollowCreatedRequest\x1a\".notification.NotificationResponseb\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
