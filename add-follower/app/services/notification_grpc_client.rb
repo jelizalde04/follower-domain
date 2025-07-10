@@ -1,5 +1,6 @@
 require 'grpc'
-require_relative '../lib/notification_services_pb' # ajusta ruta si es necesario
+require_relative '../lib/notification_pb'
+require_relative '../lib/notification_services_pb'
 
 class NotificationGrpcClient
   def initialize
