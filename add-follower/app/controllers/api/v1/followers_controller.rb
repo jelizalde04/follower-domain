@@ -33,7 +33,7 @@ def create
     # Primero intentamos enviar la notificación
     notification_sent = NotificationGrpcClient.new.send_follow_notification(
       actor_id: follower_id,
-      recipe_id: pet_id, 
+      recipient_id: pet_id, 
       responsible_id: responsible_id,
       type: "Follower",
       content: content_text,    
