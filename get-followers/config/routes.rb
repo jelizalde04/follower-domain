@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
-  get "health/show"
+  get '/health', to: proc { [200, { 'Content-Type' => 'application/json' }, ['{"status":"ok"}']] }
   mount Rswag::Ui::Engine => '/api-docs-getFollowers'
   mount Rswag::Api::Engine => '/api-docs-getaddFollowers'
-  get '/health', to: 'health#show'
+
   namespace :api do
     namespace :v1 do
       resources :followers, only: [:index]

@@ -8,7 +8,7 @@ service NotificationService {
 
 message FollowCreatedRequest {
   string actorId = 1;           // id de la mascota que siguió
-  string recipeId = 2;          // id de la mascota seguida
+  string recipientId = 2;          // id de la mascota seguida
   string responsibleId = 3;     // dueño de la mascota seguida
   string type = 4;              // "Follower"
   string content = 5;           // texto de la notificación

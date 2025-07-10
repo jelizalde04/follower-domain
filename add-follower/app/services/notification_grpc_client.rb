@@ -7,10 +7,10 @@ class NotificationGrpcClient
     @stub = Notification::NotificationService::Stub.new(@host, :this_channel_is_insecure)
   end
 
-  def send_follow_notification(actor_id:, recipe_id:, responsible_id:, type:, content:, timestamp:)
+  def send_follow_notification(actor_id:, recipient_id:, responsible_id:, type:, content:, timestamp:)
     request = Notification::FollowCreatedRequest.new(
       actorId: actor_id,
-      recipeId: recipe_id,
+      recipientId: recipient_id,
       responsibleId: responsible_id,
       type: type,
       content: content,
