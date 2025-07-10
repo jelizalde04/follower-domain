@@ -1,7 +1,7 @@
 
 # Get-Followers Microservice 
 
-## 1. Service Overview
+## 1. Service Overview 
 
 The **get-followers** service retrieves all followers for a given pet. It queries the `followers` table and returns a list of follower relationships.
 

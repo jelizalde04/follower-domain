@@ -6,7 +6,7 @@ The **remove-follower** service deletes "follow" relationships between pets. It 
 
 ---
 
-## 2. Routes and Endpoints
+## 2. Routes and Endpoints 
 
 ### Delete Follower
 
