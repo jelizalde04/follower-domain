@@ -15,7 +15,7 @@ The **Follower Domain** manages the follower relationships between pets. It allo
 - add-follower
 - remove-follower
 - get-followers
-
+ 
 ### Technologies Used:
 
 - Ruby 3.2+
