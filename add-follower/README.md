@@ -6,7 +6,7 @@ The **add-follower** service creates "follow" relationships between pets. It all
 
 - Interacts indirectly with other microservices via the database and JWT authentication.
 - (Planned) Will publish events via gRPC to the Notification Service.
-
+ 
 ---
 
 ## 2. Routes and Endpoints

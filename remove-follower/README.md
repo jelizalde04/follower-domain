@@ -30,7 +30,7 @@ Response Example:
   "message": "Follow deleted successfully"
 }
 ```
-
+ 
 ---
 
 ## 3. How the Service Works

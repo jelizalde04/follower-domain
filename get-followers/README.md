@@ -14,7 +14,7 @@ The **get-followers** service retrieves all followers for a given pet. It querie
 ```http
 GET /api/v1/followers?petId=<uuid>
 ```
-
+ 
 Response Example:
 
 ```json
